@@ -1,0 +1,5 @@
+BatchKey,AccountKey,PeriodKey,Segment,SupplierKey
+BATCH-A-N,ZAVA,202608,North,SUP-01
+BATCH-A-S,ZAVA,202608,South,SUP-02
+BATCH-S-N,ZAVA,202609,North,SUP-01
+BATCH-S-S,ZAVA,202609,South,SUP-02

@@ -1,0 +1,77 @@
+{
+  "id": "ONTOLOGY-01",
+  "status": "NOT_RUN",
+  "native_id": null,
+  "artifact_kind": "CONCEPTUAL_INTENT_NOT_DEPLOYABLE_FABRIC_DEFINITION",
+  "entities": [
+    {
+      "name": "Account",
+      "source": "fabric/accounts.csv",
+      "key": "AccountKey"
+    },
+    {
+      "name": "Period",
+      "source": "fabric/periods.csv",
+      "key": "PeriodKey"
+    },
+    {
+      "name": "OrderBatch",
+      "source": "fabric/batches.csv",
+      "key": "BatchKey"
+    },
+    {
+      "name": "Supplier",
+      "source": "fabric/suppliers.csv",
+      "key": "SupplierKey"
+    },
+    {
+      "name": "RecoveryAction",
+      "source": "fabric/recovery_tasks.csv",
+      "key": "TaskKey"
+    },
+    {
+      "name": "Opportunity",
+      "source": "fabric/opportunities.csv",
+      "key": "OpportunityKey"
+    }
+  ],
+  "relationships": [
+    {
+      "from": "Account",
+      "to": "OrderBatch",
+      "join_key": "AccountKey",
+      "meaning": "has batch"
+    },
+    {
+      "from": "Period",
+      "to": "OrderBatch",
+      "join_key": "PeriodKey",
+      "meaning": "contains batch"
+    },
+    {
+      "from": "Supplier",
+      "to": "OrderBatch",
+      "join_key": "SupplierKey",
+      "meaning": "supplies batch; not proof of cause"
+    },
+    {
+      "from": "OrderBatch",
+      "to": "RecoveryAction",
+      "join_key": "BatchKey",
+      "meaning": "has proposed investigation task"
+    },
+    {
+      "from": "Account",
+      "to": "Opportunity",
+      "join_key": "AccountKey",
+      "meaning": "has opportunity; not an order-level acceptance link"
+    }
+  ],
+  "native_binding": {
+    "workspace_id": null,
+    "lakehouse_id": null,
+    "entity_bindings": null
+  },
+  "implementation": "Import the named sources as managed lakehouse tables, inspect the actual schema, confirm preview support, then author verified entity/property/relationship bindings in the admitted UI/API. This intent file is not an API payload.",
+  "fallback": "Traverse keys in the CSV tables and label a local relationship rehearsal."
+}

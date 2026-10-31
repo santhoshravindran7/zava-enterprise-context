@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "tenantId": null,
+  "environmentLabel": "Zava enterprise sandbox",
+  "tenantDomain": null,
+  "resourcePrefix": "zava-enterprise",
+  "providers": ["SharePoint", "Fabric", "Search"],
+  "sharePoint": {"siteId": null, "driveId": null},
+  "fabric": {"workspaceId": null, "capacityId": null, "ontologyAdmitted": false, "dataAgentAdmitted": false},
+  "search": {"searchResourceId": null, "searchEndpoint": null, "apiVersion": "2026-04-01"},
+  "createDisabledPeople": false,
+  "createOutlookDrafts": false,
+  "createCalendarAppointments": false,
+  "mailboxObjectId": null,
+  "costApprovalReference": null
+}

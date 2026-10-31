@@ -1,0 +1,11 @@
+__pycache__/
+*.pyc
+.venv/
+.env
+.env.*
+*.private.json
+/infra/zava/output/
+/infra/zava/environment.local.json
+/output/
+/generated/
+*.zip

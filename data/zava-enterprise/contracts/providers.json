@@ -1,0 +1,106 @@
+{
+  "status": "NOT_RUN",
+  "data_agent": {
+    "id": "DATA-AGENT-01",
+    "native_id": null,
+    "sources": [
+      "FAB-FINANCE",
+      "FAB-COMMERCIAL",
+      "FAB-OPERATIONS"
+    ],
+    "instructions": "Use only these authorized models. Identify AccountKey ZAVA, PeriodKey and scenario before answering. Use explicit measures. Do not mix Actual and Budget. Report model and measure provenance. Missing access or a missing measure is a gap, not permission to invent an answer.",
+    "test_questions": [
+      "For ZAVA, September 2026 Actual, report revenue, gross profit and gross margin from Finance.",
+      "Compare September Actual and Budget gross profit with model and measure provenance.",
+      "For the same account and month, reconcile Commercial bookings less deferral with Finance revenue.",
+      "Report September OTIF from aggregate orders; compare with August on the same population."
+    ],
+    "fallback": "Query admitted models individually with identical filters; label this direct-model route, not a data-agent run."
+  },
+  "knowledge_services": {
+    "id": "KNOWLEDGE-01",
+    "native_id": null,
+    "documents": [
+      "DOC-01",
+      "DOC-03",
+      "DOC-04",
+      "DOC-05"
+    ],
+    "excluded": [
+      "DOC-02"
+    ],
+    "retrieval_contract": "Return source ID, version, effective date and actual source locator with passages. Only admitted synthetic documents. These are the same underlying documents as the Microsoft 365 copies.",
+    "prerequisites": "Approved project, search/index/knowledge capability, model access and cost envelope; exact API/build must be admitted.",
+    "fallback": "Read the authorized current Word documents directly and label manual document review, not Azure AI Search.",
+    "denied_access": "Stop on 401/403. Do not reuse the historical inaccessible knowledge source."
+  },
+  "web_sources": {
+    "sources": [
+      "WEB-01",
+      "WEB-02"
+    ],
+    "native_urls": [
+      null,
+      null
+    ],
+    "contract": "Read full admitted published pages; retain publication and actual retrieval times. The local markdown archives are not indexed web sources pages.",
+    "fallback": "Use the synthetic archives as labelled local market context, never a live-web claim."
+  },
+  "third_party_plugins": [
+    {
+      "provider": "Asana",
+      "id": "PLUGIN-ASANA",
+      "project_id": null,
+      "fixture": "plugins/asana-project.json",
+      "read_contract": [
+        "project identity",
+        "task identity",
+        "completed",
+        "assignee",
+        "due_on",
+        "description"
+      ],
+      "allowed_consumption": [
+        "read approved project",
+        "read approved tasks"
+      ],
+      "forbidden": [
+        "create",
+        "assign",
+        "change due date",
+        "complete",
+        "comment",
+        "invite",
+        "delete"
+      ],
+      "fallback": "Inspect the local project snapshot; label LOCAL_FIXTURE, not a plugin call."
+    },
+    {
+      "provider": "Salesforce",
+      "id": "PLUGIN-CRM",
+      "organization_id": null,
+      "fixture": "plugins/salesforce-opportunities.json",
+      "read_contract": [
+        "approved sandbox identity",
+        "opportunity identity",
+        "stage",
+        "amount",
+        "currency",
+        "period"
+      ],
+      "allowed_consumption": [
+        "read approved synthetic opportunities"
+      ],
+      "forbidden": [
+        "create",
+        "edit",
+        "close opportunity",
+        "email",
+        "change permissions",
+        "delete"
+      ],
+      "fallback": "Inspect the local opportunity snapshot; label LOCAL_FIXTURE, not a plugin call."
+    }
+  ],
+  "plugin_admission": "Connection, supported actions, available permission scopes and actual consent must be reviewed in the target build. Request minimum supported access. Do not invent scope strings or infer read-only permissions from guidance. If unwanted write tools cannot be excluded, use the local/manual lane."
+}

@@ -1,0 +1,68 @@
+{
+  "classification": "SYNTHETIC_TRAINING_ONLY",
+  "status": "LOCAL_FIXTURE",
+  "project_id": null,
+  "name": "Zava Recovery",
+  "tasks": [
+    {
+      "id": "TASK-01",
+      "native_id": null,
+      "name": "[DEMO] Validate the September close scope",
+      "completed": false,
+      "assignee": null,
+      "due_on": null,
+      "batch_key": "BATCH-S-N",
+      "description": "Stage illustration: ready for review. Proposed role: Finance Controller. Not assigned, scheduled, completed or approved."
+    },
+    {
+      "id": "TASK-02",
+      "native_id": null,
+      "name": "[DEMO] Verify customer acceptance evidence",
+      "completed": false,
+      "assignee": null,
+      "due_on": null,
+      "batch_key": "BATCH-S-S",
+      "description": "Stage illustration: ready for review. Proposed role: Account Lead. Not assigned, scheduled, completed or approved."
+    },
+    {
+      "id": "TASK-03",
+      "native_id": null,
+      "name": "[DEMO] Investigate North supplier timing",
+      "completed": false,
+      "assignee": null,
+      "due_on": null,
+      "batch_key": "BATCH-S-N",
+      "description": "Stage illustration: ready for review. Proposed role: Procurement Lead. Not assigned, scheduled, completed or approved."
+    },
+    {
+      "id": "TASK-04",
+      "native_id": null,
+      "name": "[DEMO] Review routing and freight feasibility",
+      "completed": false,
+      "assignee": null,
+      "due_on": null,
+      "batch_key": "BATCH-S-S",
+      "description": "Stage illustration: ready for review. Proposed role: Operations Lead. Not assigned, scheduled, completed or approved."
+    },
+    {
+      "id": "TASK-05",
+      "native_id": null,
+      "name": "[DEMO] Prepare a bounded expedite proposal",
+      "completed": false,
+      "assignee": null,
+      "due_on": null,
+      "batch_key": "BATCH-S-N",
+      "description": "Stage illustration: ready for review. Proposed role: Commercial Director. Not assigned, scheduled, completed or approved."
+    },
+    {
+      "id": "TASK-06",
+      "native_id": null,
+      "name": "[DEMO] Review internal customer talking points",
+      "completed": false,
+      "assignee": null,
+      "due_on": null,
+      "batch_key": "BATCH-S-S",
+      "description": "Stage illustration: ready for review. Proposed role: Account Lead. Not assigned, scheduled, completed or approved."
+    }
+  ]
+}

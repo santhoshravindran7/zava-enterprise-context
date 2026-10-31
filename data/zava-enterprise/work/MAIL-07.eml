@@ -1,0 +1,19 @@
+From: morgan.ellis@zava.example
+To: margin.desk@zava.example
+Subject: [SYNTHETIC ZAVA-CONTEXT] Recovery board presentation labels are not
+ task state
+Date: Tue, 06 Oct 2026 11:00:00 +0000
+Message-ID: <zava-mail-07@zava.example>
+X-Unsent: 1
+X-ZAVA-CONTEXT-Classification: SYNTHETIC_TRAINING_ONLY
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+
+SYNTHETIC ENTERPRISE EMAIL. NOT SENT. Business dates are scenario data.
+
+Yesterday's presentation used the phrase ready for review beside the recovery=
+ tasks. That was a proposed review stage in descriptions, not an assignment o=
+r completion. Check the actual Asana completed, assignee and due_on fields. A=
+ proposed owner role in a description does not assign that person. Please do =
+not edit the project during the demonstration.

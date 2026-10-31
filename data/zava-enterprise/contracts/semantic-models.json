@@ -1,0 +1,249 @@
+{
+  "classification": "SYNTHETIC_TRAINING_ONLY",
+  "models": [
+    {
+      "id": "FAB-FINANCE",
+      "proposed_name": "Zava Finance",
+      "native_id": null,
+      "status": "NOT_RUN",
+      "implementation": "MANUAL_IMPORT_CONTRACT",
+      "fact_table": "Finance",
+      "file": "fabric/finance.csv",
+      "grain": "AccountKey, Date, Segment, Scenario",
+      "dimensions": {
+        "Account": "fabric/accounts.csv",
+        "Calendar": "fabric/calendar.csv",
+        "Segments": "fabric/segments.csv"
+      },
+      "relationships": [
+        {
+          "from": "Finance.AccountKey",
+          "to": "Account.AccountKey",
+          "cardinality": "many-to-one",
+          "filter_direction": "dimension-to-fact",
+          "active": true
+        },
+        {
+          "from": "Finance.Date",
+          "to": "Calendar.Date",
+          "cardinality": "many-to-one",
+          "filter_direction": "dimension-to-fact",
+          "active": true
+        },
+        {
+          "from": "Finance.Segment",
+          "to": "Segments.Segment",
+          "cardinality": "many-to-one",
+          "filter_direction": "dimension-to-fact",
+          "active": true
+        }
+      ],
+      "types": {
+        "Date": "Date",
+        "PeriodKey": "Int64",
+        "money_columns": "Int64 USD",
+        "count_columns": "Int64",
+        "other_columns": "Text"
+      },
+      "hide": "Fact money/count columns, foreign keys; expose explicit measures and dimensions.",
+      "measures": [
+        {
+          "name": "Recognized Revenue",
+          "expression": "CALCULATE(SUM(Finance[RevenueUSD]), KEEPFILTERS(Finance[Scenario] = \"Actual\"))",
+          "format": "$#,0;($#,0);$0",
+          "description": "Synthetic Finance measure: Recognized Revenue. Preserve account and period filters."
+        },
+        {
+          "name": "Base COGS",
+          "expression": "CALCULATE(SUM(Finance[BaseCOGSUSD]), KEEPFILTERS(Finance[Scenario] = \"Actual\"))",
+          "format": "$#,0;($#,0);$0",
+          "description": "Synthetic Finance measure: Base COGS. Preserve account and period filters."
+        },
+        {
+          "name": "Freight",
+          "expression": "CALCULATE(SUM(Finance[FreightUSD]), KEEPFILTERS(Finance[Scenario] = \"Actual\"))",
+          "format": "$#,0;($#,0);$0",
+          "description": "Synthetic Finance measure: Freight. Preserve account and period filters."
+        },
+        {
+          "name": "Gross Profit",
+          "expression": "[Recognized Revenue] - [Base COGS] - [Freight]",
+          "format": "$#,0;($#,0);$0",
+          "description": "Synthetic Finance measure: Gross Profit. Preserve account and period filters."
+        },
+        {
+          "name": "Gross Margin",
+          "expression": "DIVIDE([Gross Profit], [Recognized Revenue])",
+          "format": "0.00%",
+          "description": "Synthetic Finance measure: Gross Margin. Preserve account and period filters."
+        },
+        {
+          "name": "Budget Revenue",
+          "expression": "CALCULATE(SUM(Finance[RevenueUSD]), KEEPFILTERS(Finance[Scenario] = \"Budget\"))",
+          "format": "$#,0;($#,0);$0",
+          "description": "Synthetic Finance measure: Budget Revenue. Preserve account and period filters."
+        },
+        {
+          "name": "Budget Gross Profit",
+          "expression": "CALCULATE(SUM(Finance[RevenueUSD]) - SUM(Finance[BaseCOGSUSD]) - SUM(Finance[FreightUSD]), KEEPFILTERS(Finance[Scenario] = \"Budget\"))",
+          "format": "$#,0;($#,0);$0",
+          "description": "Synthetic Finance measure: Budget Gross Profit. Preserve account and period filters."
+        },
+        {
+          "name": "Gross Profit Variance",
+          "expression": "IF(NOT ISBLANK([Recognized Revenue]) && NOT ISBLANK([Budget Gross Profit]), [Gross Profit] - [Budget Gross Profit])",
+          "format": "$#,0;($#,0);$0",
+          "description": "Synthetic Finance measure: Gross Profit Variance. Preserve account and period filters."
+        }
+      ]
+    },
+    {
+      "id": "FAB-COMMERCIAL",
+      "proposed_name": "Zava Commercial",
+      "native_id": null,
+      "status": "NOT_RUN",
+      "implementation": "MANUAL_IMPORT_CONTRACT",
+      "fact_table": "Commercial",
+      "file": "fabric/commercial.csv",
+      "grain": "AccountKey, Date, Segment",
+      "dimensions": {
+        "Account": "fabric/accounts.csv",
+        "Calendar": "fabric/calendar.csv",
+        "Segments": "fabric/segments.csv"
+      },
+      "relationships": [
+        {
+          "from": "Commercial.AccountKey",
+          "to": "Account.AccountKey",
+          "cardinality": "many-to-one",
+          "filter_direction": "dimension-to-fact",
+          "active": true
+        },
+        {
+          "from": "Commercial.Date",
+          "to": "Calendar.Date",
+          "cardinality": "many-to-one",
+          "filter_direction": "dimension-to-fact",
+          "active": true
+        },
+        {
+          "from": "Commercial.Segment",
+          "to": "Segments.Segment",
+          "cardinality": "many-to-one",
+          "filter_direction": "dimension-to-fact",
+          "active": true
+        }
+      ],
+      "types": {
+        "Date": "Date",
+        "PeriodKey": "Int64",
+        "money_columns": "Int64 USD",
+        "count_columns": "Int64",
+        "other_columns": "Text"
+      },
+      "hide": "Fact money/count columns, foreign keys; expose explicit measures and dimensions.",
+      "measures": [
+        {
+          "name": "Firm Bookings",
+          "expression": "SUM(Commercial[FirmBookingsUSD])",
+          "format": "$#,0;($#,0);$0",
+          "description": "Synthetic Commercial measure: Firm Bookings. Preserve account and period filters."
+        },
+        {
+          "name": "Period End Deferral",
+          "expression": "SUM(Commercial[DeferralUSD])",
+          "format": "$#,0;($#,0);$0",
+          "description": "Synthetic Commercial measure: Period End Deferral. Preserve account and period filters."
+        },
+        {
+          "name": "Bookings Less Deferral (Lab)",
+          "expression": "[Firm Bookings] - [Period End Deferral]",
+          "format": "$#,0;($#,0);$0",
+          "description": "Synthetic Commercial measure: Bookings Less Deferral (Lab). Preserve account and period filters."
+        }
+      ]
+    },
+    {
+      "id": "FAB-OPERATIONS",
+      "proposed_name": "Zava Operations",
+      "native_id": null,
+      "status": "NOT_RUN",
+      "implementation": "MANUAL_IMPORT_CONTRACT",
+      "fact_table": "Operations",
+      "file": "fabric/operations.csv",
+      "grain": "AccountKey, Date, Segment",
+      "dimensions": {
+        "Account": "fabric/accounts.csv",
+        "Calendar": "fabric/calendar.csv",
+        "Segments": "fabric/segments.csv"
+      },
+      "relationships": [
+        {
+          "from": "Operations.AccountKey",
+          "to": "Account.AccountKey",
+          "cardinality": "many-to-one",
+          "filter_direction": "dimension-to-fact",
+          "active": true
+        },
+        {
+          "from": "Operations.Date",
+          "to": "Calendar.Date",
+          "cardinality": "many-to-one",
+          "filter_direction": "dimension-to-fact",
+          "active": true
+        },
+        {
+          "from": "Operations.Segment",
+          "to": "Segments.Segment",
+          "cardinality": "many-to-one",
+          "filter_direction": "dimension-to-fact",
+          "active": true
+        }
+      ],
+      "types": {
+        "Date": "Date",
+        "PeriodKey": "Int64",
+        "money_columns": "Int64 USD",
+        "count_columns": "Int64",
+        "other_columns": "Text"
+      },
+      "hide": "Fact money/count columns, foreign keys; expose explicit measures and dimensions.",
+      "measures": [
+        {
+          "name": "Eligible Orders",
+          "expression": "SUM(Operations[EligibleOrders])",
+          "format": "#,0",
+          "description": "Synthetic Operations measure: Eligible Orders. Preserve account and period filters."
+        },
+        {
+          "name": "OTIF Orders",
+          "expression": "SUM(Operations[OTIFOrders])",
+          "format": "#,0",
+          "description": "Synthetic Operations measure: OTIF Orders. Preserve account and period filters."
+        },
+        {
+          "name": "OTIF",
+          "expression": "DIVIDE([OTIF Orders], [Eligible Orders])",
+          "format": "0.00%",
+          "description": "Synthetic Operations measure: OTIF. Preserve account and period filters."
+        },
+        {
+          "name": "Operational Freight",
+          "expression": "SUM(Operations[FreightUSD])",
+          "format": "$#,0;($#,0);$0",
+          "description": "Synthetic Operations measure: Operational Freight. Preserve account and period filters."
+        },
+        {
+          "name": "Expedited Freight Subset",
+          "expression": "SUM(Operations[ExpeditedFreightUSD])",
+          "format": "$#,0;($#,0);$0",
+          "description": "Synthetic Operations measure: Expedited Freight Subset. Preserve account and period filters."
+        }
+      ]
+    }
+  ],
+  "native_execution": "NOT_RUN",
+  "date_table": "Mark Calendar.Date as the date table.",
+  "sorting": "Sort Calendar.MonthLabel by Calendar.PeriodKey.",
+  "security": "Full-Zava analyst only; no native RLS, CLS or OLS claim. No restricted-role fixtures."
+}

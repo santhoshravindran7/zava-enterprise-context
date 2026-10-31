@@ -1,0 +1,40 @@
+{
+  "classification": "SYNTHETIC_TRAINING_ONLY",
+  "status": "LOCAL_FIXTURE",
+  "organization_id": null,
+  "opportunities": [
+    {
+      "id": "OPP-01",
+      "native_id": null,
+      "customer": "Cedar Bridge Stores",
+      "segment": "North",
+      "stage": "Closed Won",
+      "amount": 8000000,
+      "currency": "USD",
+      "period_key": 202609,
+      "account_key": "ZAVA"
+    },
+    {
+      "id": "OPP-02",
+      "native_id": null,
+      "customer": "Pine Grove Supply",
+      "segment": "South",
+      "stage": "Closed Won",
+      "amount": 6000000,
+      "currency": "USD",
+      "period_key": 202609,
+      "account_key": "ZAVA"
+    },
+    {
+      "id": "OPP-03",
+      "native_id": null,
+      "customer": "Maple Works",
+      "segment": "North",
+      "stage": "Open Pipeline",
+      "amount": 2000000,
+      "currency": "USD",
+      "period_key": 202609,
+      "account_key": "ZAVA"
+    }
+  ]
+}
