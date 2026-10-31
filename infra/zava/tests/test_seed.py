@@ -86,6 +86,7 @@ class SeedTests(unittest.TestCase):
             self.assertIsNone(archive.testzip())
             names = archive.namelist()
             self.assertIn("infra/zava/Setup-Zava.ps1", names)
+            self.assertIn("infra/zava/Setup-SharePointSite.ps1", names)
             self.assertIn("infra/zava/environment.template.json", names)
             self.assertIn("docs/enterprise-scenarios.md", names)
             self.assertFalse(any("private" in name or name.endswith("/config.json") or name.endswith("/plan.json") for name in names))

@@ -64,9 +64,9 @@ function Get-ZavaToken([string]$Audience) {
     if (-not (Get-Command az -ErrorAction SilentlyContinue)) { throw 'Azure CLI is required for live operations; no automatic installation or login is performed.' }
     $tenant = $script:Context.Config.tenantId
     $tenantGuid = [guid]::Empty
-    if (-not [guid]::TryParse($tenant, [ref]$tenantGuid) -or $tenantGuid -eq [guid]::Empty) { throw 'A real approved sandbox tenant GUID is required.' }
+    if (-not [guid]::TryParse($tenant, [ref]$tenantGuid) -or $tenantGuid -eq [guid]::Empty) { throw 'A real approved tenant GUID is required.' }
     $raw = & az account get-access-token --tenant $tenant --resource $Audience --output json --only-show-errors
-    if ($LASTEXITCODE -ne 0) { throw "Token acquisition failed for $Audience. Log in to the issued approved sandbox tenant yourself." }
+    if ($LASTEXITCODE -ne 0) { throw "Token acquisition failed for $Audience. Log in to the exact approved tenant yourself." }
     $credential = ($raw -join "`n") | ConvertFrom-Json -AsHashtable
     $encoded = $credential.accessToken.Split('.')[1].Replace('-', '+').Replace('_', '/')
     $encoded = $encoded.PadRight($encoded.Length + ((4 - $encoded.Length % 4) % 4), '=')
@@ -74,6 +74,13 @@ function Get-ZavaToken([string]$Audience) {
     if ($claims.tid -ne $tenant) { throw 'STOP: token belongs to another tenant.' }
     $validAudiences = @($Audience.TrimEnd('/'))
     if ($Audience -eq 'https://graph.microsoft.com') { $validAudiences += '00000003-0000-0000-c000-000000000000' }
+    if ($script:Context.Config.sharePoint.ContainsKey('siteUrl') -and $script:Context.Config.sharePoint.siteUrl) {
+        $site = [uri]$script:Context.Config.sharePoint.siteUrl
+        if ($site.Scheme -eq 'https' -and $site.Host -match '^[a-z0-9-]+\.sharepoint\.com$' -and
+            $site.IsDefaultPort -and -not $site.UserInfo -and $Audience -eq $site.GetLeftPart([UriPartial]::Authority)) {
+            $validAudiences += '00000003-0000-0ff1-ce00-000000000000'
+        }
+    }
     if ($claims.aud.TrimEnd('/') -notin $validAudiences) { throw 'STOP: token audience mismatch.' }
     $script:Tokens[$Audience] = @{Token = $credential.accessToken; Expires = [DateTimeOffset]::FromUnixTimeSeconds([long]$claims.exp)}
     return $credential.accessToken
@@ -89,6 +96,13 @@ function Invoke-ZavaRequest([string]$Uri, [string]$Audience, [string]$Method = '
     }
     if ($script:Context.Config.search.searchEndpoint) {
         $hosts['https://search.azure.com'] = ([uri]$script:Context.Config.search.searchEndpoint).Host
+    }
+    if ($script:Context.Config.sharePoint.ContainsKey('siteUrl') -and $script:Context.Config.sharePoint.siteUrl) {
+        $site = [uri]$script:Context.Config.sharePoint.siteUrl
+        if ($site.Scheme -eq 'https' -and $site.Host -match '^[a-z0-9-]+\.sharepoint\.com$' -and
+            $site.IsDefaultPort -and -not $site.UserInfo) {
+            $hosts[$site.GetLeftPart([UriPartial]::Authority)] = $site.Host
+        }
     }
     if ($target.Scheme -ne 'https' -or $target.Host -ne $hosts[$Audience] -or -not $target.IsDefaultPort -or $target.UserInfo) {
         throw 'Refusing an unapproved host, insecure URI or token redirect.'
@@ -129,14 +143,19 @@ function Get-ZavaPages([string]$Uri, [string]$Audience, [string]$NextKey) {
     return ,$items.ToArray()
 }
 
-function Invoke-ZavaPreflight {
+function Assert-ZavaIdentity {
     $config = $script:Context.Config
     $organization = Invoke-ZavaRequest "$script:Graph/organization" 'https://graph.microsoft.com'
     Assert-ZavaResponse $organization
-    if ($organization.Body.value.Count -ne 1 -or $organization.Body.value[0].id -ne $config.tenantId) { throw 'approved sandbox organization mismatch.' }
+    if ($organization.Body.value.Count -ne 1 -or $organization.Body.value[0].id -ne $config.tenantId) { throw 'Approved tenant organization mismatch.' }
     $domain = Invoke-ZavaRequest "$script:Graph/domains/$($config.tenantDomain)" 'https://graph.microsoft.com'
     Assert-ZavaResponse $domain
     if (-not $domain.Body.isVerified -or $domain.Body.id -ne $config.tenantDomain) { throw 'Domain is not verified in this tenant.' }
+}
+
+function Invoke-ZavaPreflight {
+    $config = $script:Context.Config
+    Assert-ZavaIdentity
     if ('SharePoint' -in $config.providers) {
         $drives = Get-ZavaPages "$script:Graph/sites/$($config.sharePoint.siteId)/drives" 'https://graph.microsoft.com' '@odata.nextLink'
         if ($config.sharePoint.driveId -notin $drives.id) { throw 'Drive is not in the approved site.' }
@@ -191,6 +210,111 @@ function Save-ZavaReceipt([string]$Key, [string]$State, [string]$Id = '', [strin
     }
     $script:Context.Ledger[$Key] = @{State = $State; Id = $Id; Operation = $Operation; At = [DateTimeOffset]::UtcNow.ToString('o')}
     Save-ZavaJson $script:Context.LedgerPath $script:Context.Ledger
+}
+
+function Assert-ZavaSharePointReaders([string]$ScopeUri, [string]$SiteUrl, [string]$Audience, [hashtable]$Headers, [string]$Owner) {
+    $assignments = Invoke-ZavaRequest "$ScopeUri/roleassignments?`$expand=Member,RoleDefinitionBindings" $Audience -ExtraHeaders $Headers
+    Assert-ZavaResponse $assignments @(200)
+    if ($assignments.Body.ContainsKey('odata.nextLink') -or $assignments.Body.ContainsKey('@odata.nextLink')) {
+        throw 'Paginated site permissions require manual review; no content is uploaded.'
+    }
+    $ownerFound = $false
+    foreach ($assignment in $assignments.Body.value) {
+        if (@($assignment.RoleDefinitionBindings | Where-Object RoleTypeKind -ne 1).Count -eq 0) { continue }
+        $members = @($assignment.Member)
+        if ($assignment.Member.PrincipalType -eq 8) {
+            $groupId = [int]$assignment.Member.Id
+            $group = Invoke-ZavaRequest "$SiteUrl/_api/web/sitegroups/getbyid($groupId)/users" $Audience -ExtraHeaders $Headers
+            Assert-ZavaResponse $group @(200)
+            if ($group.Body.ContainsKey('odata.nextLink') -or $group.Body.ContainsKey('@odata.nextLink')) {
+                throw 'Paginated group membership requires manual review; no content is uploaded.'
+            }
+            $members = @($group.Body.value)
+        }
+        foreach ($member in $members) {
+            if ($member.Email -ne $Owner -and $member.LoginName -ne "i:0#.f|membership|$Owner") {
+                throw 'Unexpected site reader/member from tenant provisioning policy; inspect privately before seeding. No automatic permission changes.'
+            }
+            $ownerFound = $true
+        }
+    }
+    if (-not $ownerFound) { throw 'Owner access was not present in role-assignment readback; manual review is required.' }
+}
+
+function Invoke-ZavaSharePointSite([switch]$VerifyOnly) {
+    $config = $script:Context.Config
+    $plan = Read-ZavaJson (Join-Path $script:Context.Bundle 'plan.json')
+    if (-not $plan.ContainsKey('kind') -or $plan.kind -ne 'SHAREPOINT_SITE') { throw 'A separate approved SharePoint site plan is required.' }
+    Assert-ZavaIdentity
+    $me = Invoke-ZavaRequest "$script:Graph/me?`$select=userPrincipalName" 'https://graph.microsoft.com'
+    Assert-ZavaResponse $me @(200)
+    if ($me.Body.userPrincipalName -ne $config.sharePoint.ownerUpn) { throw 'Site owner must be the authenticated operator; no creation on another person''s behalf.' }
+    $site = [uri]$config.sharePoint.siteUrl
+    $audience = $site.GetLeftPart([UriPartial]::Authority)
+    $headers = @{Accept = 'application/json;odata.metadata=none'; 'odata-version' = '4.0'}
+    $statusUri = "$audience/_api/SPSiteManager/status?url='$([uri]::EscapeDataString($site.AbsoluteUri))'"
+    $key = 'sharepoint/site'
+    $status = Invoke-ZavaRequest $statusUri $audience -ExtraHeaders $headers
+    Assert-ZavaResponse $status @(200)
+    if ($script:Context.Ledger.ContainsKey($key)) {
+        $receipt = $script:Context.Ledger[$key]
+        if ($receipt.State -notin @('PENDING', 'CREATED') -or -not $receipt.Id -or -not $receipt.Operation) {
+            throw 'Uncertain prior site creation; reconcile the exact site and ledger before resume. No blind retry.'
+        }
+        if ($receipt.Operation -ne $statusUri) { throw 'Site operation does not match the approved URL.' }
+    } else {
+        if ($VerifyOnly) { throw 'No owned site creation receipt; Verify cannot create or adopt a site.' }
+        if ($status.Body.SiteStatus -ne 0) { throw 'Site URL is occupied or provisioning; no adoption or overwrite.' }
+        Save-ZavaReceipt $key 'PENDING'
+        $created = Invoke-ZavaRequest "$audience/_api/SPSiteManager/create" $audience 'POST' $plan.request -ExtraHeaders $headers
+        Assert-ZavaResponse $created @(200)
+        $guid = [guid]::Empty
+        if ($created.Body.SiteStatus -notin @(1, 2) -or $created.Body.SiteUrl -ne $site.AbsoluteUri -or
+            -not [guid]::TryParse($created.Body.SiteId, [ref]$guid) -or $guid -eq [guid]::Empty) {
+            throw 'Unexpected site-creation response; retain the uncertain receipt and reconcile, never replay.'
+        }
+        Save-ZavaReceipt $key 'PENDING' $created.Body.SiteId $statusUri
+        $status = Invoke-ZavaRequest $statusUri $audience -ExtraHeaders $headers
+        Assert-ZavaResponse $status @(200)
+    }
+    $deadline = [DateTimeOffset]::UtcNow.AddSeconds($script:Context.WaitSeconds)
+    while ($true) {
+        if ($status.Body.SiteStatus -notin @(1, 2) -or $status.Body.SiteId -ne $script:Context.Ledger[$key].Id -or
+            $status.Body.SiteUrl -ne $site.AbsoluteUri) { throw 'Site status/identity mismatch or provisioning error; no automatic retry/delete.' }
+        if ($status.Body.SiteStatus -eq 2) { break }
+        if ($script:Context.Ledger[$key].State -eq 'CREATED') { throw 'Previously ready site no longer reports Ready.' }
+        if ([DateTimeOffset]::UtcNow -ge $deadline) { throw 'Site provisioning exceeded the wait limit; it may continue. Resume the known status operation, not creation.' }
+        Start-Sleep -Seconds 5
+        $status = Invoke-ZavaRequest $statusUri $audience -ExtraHeaders $headers
+        Assert-ZavaResponse $status @(200)
+    }
+    Save-ZavaReceipt $key 'CREATED' $status.Body.SiteId $statusUri
+    Assert-ZavaSharePointReaders "$($site.AbsoluteUri)/_api/web" $site.AbsoluteUri $audience $headers $config.sharePoint.ownerUpn
+    $resolved = Invoke-ZavaRequest "$script:Graph/sites/$($site.Host):$($site.AbsolutePath)" 'https://graph.microsoft.com'
+    Assert-ZavaResponse $resolved @(200)
+    if ($resolved.Body.webUrl -ne $site.AbsoluteUri -or
+        $resolved.Body.id -notlike "$($site.Host),$($status.Body.SiteId),*") { throw 'Graph resolved a different site.' }
+    $drive = Invoke-ZavaRequest "$script:Graph/sites/$($resolved.Body.id)/drive?`$select=id,driveType,sharepointIds" 'https://graph.microsoft.com'
+    Assert-ZavaResponse $drive @(200)
+    if ($drive.Body.driveType -ne 'documentLibrary' -or -not $drive.Body.id) { throw 'Default document library is not ready.' }
+    $listId = [guid]::Empty
+    if ($drive.Body.sharepointIds.siteId -ne $status.Body.SiteId -or
+        -not [guid]::TryParse($drive.Body.sharepointIds.listId, [ref]$listId) -or $listId -eq [guid]::Empty) { throw 'Default library SharePoint identifiers do not match the site.' }
+    $listUri = "$($site.AbsoluteUri)/_api/web/lists(guid'$listId')"
+    $list = Invoke-ZavaRequest "${listUri}?`$select=HasUniqueRoleAssignments" $audience -ExtraHeaders $headers
+    Assert-ZavaResponse $list @(200)
+    if ($list.Body.HasUniqueRoleAssignments -isnot [bool]) { throw 'Library permission inheritance was not read back.' }
+    if ($list.Body.HasUniqueRoleAssignments) {
+        Assert-ZavaSharePointReaders $listUri $site.AbsoluteUri $audience $headers $config.sharePoint.ownerUpn
+    }
+    $result = @{
+        Tenant = $config.tenantId; ObservedAt = [DateTimeOffset]::UtcNow.ToString('o')
+        SiteId = $resolved.Body.id; DriveId = $drive.Body.id; SiteUrl = $site.AbsoluteUri
+        SiteStatus = 'READY_READ_BACK'; ContentAccess = 'OWNER_ONLY_SITE_AND_LIBRARY_ROLE_CHECKS'
+        TenantAdministratorAccess = 'IMPLICIT_NOT_CHANGED'; SourceIndexing = 'NOT_RUN'; FilesUploaded = 0
+    }
+    Save-ZavaJson (Join-Path $script:Context.Bundle 'sharepoint-target.private.json') $result
+    return $result
 }
 
 function Wait-ZavaOperation([string]$Uri) {
@@ -442,4 +566,4 @@ function Test-ZavaNative {
     return $report
 }
 
-Export-ModuleMember -Function Read-ZavaJson, Save-ZavaJson, Initialize-Zava, Assert-ZavaBundle, Invoke-ZavaPreflight, Invoke-ZavaSeed, Test-ZavaNative, Expand-ZavaDefinition
+Export-ModuleMember -Function Read-ZavaJson, Save-ZavaJson, Initialize-Zava, Assert-ZavaBundle, Invoke-ZavaPreflight, Invoke-ZavaSeed, Test-ZavaNative, Expand-ZavaDefinition, Invoke-ZavaSharePointSite

@@ -8,8 +8,12 @@ data, directory personas, knowledge services and SaaS snapshots.
 
 **No live environment has been provisioned or verified.** The repository
 generates local assets and deployment plans without authentication. Approved
-deployment requires your own isolated tenant and existing service resources.
+deployment requires an approved tenant, isolated synthetic-data test resources
+and existing service entitlements.
 Generated content is not proof of native ingestion, indexing or source access.
+An optional, separately approved communication-site bootstrap can prepare a
+new SharePoint test site and read back its library IDs; it never uploads the
+enterprise corpus under the site-only approval.
 
 ## Enterprise inventory
 
@@ -71,6 +75,7 @@ startup, permissions and indexing can take longer.
 python -B -m unittest discover -s .\infra\zava\tests -v
 pwsh -NoProfile -File .\infra\zava\tests\Test-Safety.ps1
 pwsh -NoProfile -File .\infra\zava\tests\Test-Provisioning.ps1
+pwsh -NoProfile -File .\infra\zava\tests\Test-SharePointSite.ps1
 ```
 
 Provisioning tests intercept service calls and never connect to cloud services.

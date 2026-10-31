@@ -2,7 +2,8 @@
 
 ## Permission and cost boundary
 
-Use an approved isolated tenant and existing service resources. Before any live
+Use an approved tenant, isolated synthetic-data test resources and existing
+service entitlements. Before any live
 write, review the exact plan, configured targets, file/resource counts, existing
 privileges and incremental storage/compute/query usage with the human operator.
 Configuration fields are not consent, billing limits or role grants.
@@ -11,6 +12,7 @@ Configuration fields are not consent, billing limits or role grants.
 |---|---|
 | Identity checks | Graph organization and verified-domain read |
 | SharePoint | Approved write access to the named site/library |
+| Optional new SharePoint site | Existing site-creation authority, Graph self read and SharePoint site/group permission read; operator is owner |
 | Fabric | Create-item/write access on approved active capacity/workspace; OneLake access |
 | Search | ARM read for the exact service; Search Service Contributor and Index Data Contributor/Reader as applicable |
 | Optional disabled users | Approved Graph user-creation access and administrator authority |
@@ -29,6 +31,10 @@ their target/connection separately.
 3. Generate/review a new bound plan; obtain exact human approval.
 4. Log in only to the approved tenant. Preflight verifies all configured
    provider scopes before resource writes.
+   If a new SharePoint site is needed, first run the separately approved
+   `Setup-SharePointSite.ps1` site-only plan. Read its real site/library IDs and
+   role-assignment evidence privately, then bind and approve a new content
+   plan. Site approval is not source-upload approval.
 5. Create an isolated SharePoint folder and upload all listed archive/document
    paths. Optional disabled users and recipient-free drafts/appointments have
    their own explicitly enabled plan rows.
@@ -131,12 +137,24 @@ source paths. A receipt does not prove byte-level source readback or service
 indexing. Do not publish config, live IDs, operations, full private retrieval
 responses, secrets or tenant evidence.
 
+The optional communication-site bootstrap uses the documented SharePoint REST
+site manager. A ready site must match its owned ledger GUID and exact URL;
+Graph must resolve that same site and its default document library. Existing
+URLs are never adopted. Site permissions and default-library inheritance or
+unique role assignments are inspected before returning seed targets.
+A missing/ambiguous creation response leaves PENDING
+and requires manual reconciliation. Known site-status operations can be
+resumed without another creation request. If Graph/library readiness or
+permission readback fails, keep the site and retry read-only Verify after
+inspection; do not automatically recreate, delete or change permissions.
+
 There is no automatic reset or prefix-based cleanup. Present an exact resource
 list and obtain separate approval for cancellation/deletion.
 
 ## API contracts
 
 - [Fabric create items](https://learn.microsoft.com/en-us/rest/api/fabric/core/items/create-item)
+- [SharePoint modern-site creation and status](https://learn.microsoft.com/en-us/sharepoint/dev/apis/site-creation-rest)
 - [Fabric lakehouse creation](https://learn.microsoft.com/en-us/rest/api/fabric/lakehouse/items/create-lakehouse)
 - [Fabric data-agent definitions](https://learn.microsoft.com/en-us/rest/api/fabric/articles/item-management/definitions/data-agent-definition)
 - [Knowledge-base creation](https://learn.microsoft.com/en-us/azure/search/agentic-retrieval-how-to-create-knowledge-base)

@@ -5,7 +5,7 @@
   "tenantDomain": null,
   "resourcePrefix": "zava-enterprise",
   "providers": ["SharePoint", "Fabric", "Search"],
-  "sharePoint": {"siteId": null, "driveId": null},
+  "sharePoint": {"siteId": null, "driveId": null, "siteUrl": null, "siteTitle": null, "ownerUpn": null},
   "fabric": {"workspaceId": null, "capacityId": null, "ontologyAdmitted": false, "dataAgentAdmitted": false},
   "search": {"searchResourceId": null, "searchEndpoint": null, "apiVersion": "2026-04-01"},
   "createDisabledPeople": false,

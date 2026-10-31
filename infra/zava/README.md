@@ -26,9 +26,10 @@ Copy `environment.template.json` outside the repository. Resolve:
 
 | Setting | Required target |
 |---|---|
-| tenantId / tenantDomain | Exact approved isolated Entra tenant GUID and verified domain |
+| tenantId / tenantDomain | Exact approved Entra tenant GUID and verified domain; isolate test sites/workspaces, not production data |
 | environmentLabel | Operator-readable sandbox label, not an Azure resource ID |
-| sharePoint.siteId / driveId | Existing approved site and document library |
+| sharePoint.siteId / driveId | Existing approved site/library, or IDs read back by the separately approved site bootstrap below |
+| sharePoint.siteUrl / siteTitle / ownerUpn | Only for the optional, separate communication-site bootstrap |
 | fabric.workspaceId / capacityId | Existing workspace on an active approved capacity |
 | ontologyAdmitted / dataAgentAdmitted | Explicitly confirmed service feature availability |
 | search.searchResourceId / searchEndpoint | Existing Azure AI Search ARM ID and matching HTTPS endpoint |
@@ -54,6 +55,50 @@ Get-Content C:\ZavaPrivate\bound-001\plan.json -Raw
 
 Read the entire plan, exact resources and its bound asset manifests. Unknown
 targets produce `DRAFT_UNBOUND` and cannot be applied.
+
+## Optional new SharePoint test site
+
+The same setup supports an approved corporate test tenant and an isolated
+training tenant. Keep separate configurations, plans and ledgers; a corporate
+test is not evidence that a training tenant works. Do not hard-code an account,
+tenant or SharePoint hostname into the source.
+
+If no existing approved site is available, populate `sharePoint.siteUrl`,
+`siteTitle` and `ownerUpn` in the private configuration. Use an exact
+`https://<approved-host>.sharepoint.com/sites/<new-site-slug>` URL and the
+authenticated operator's UPN in the verified tenant domain. Obtain site-creation
+permission through the organization's existing process; this toolkit does not
+grant access or bypass corporate site/lab policies.
+
+```powershell
+pwsh -NoProfile -File .\infra\zava\Setup-SharePointSite.ps1 -Phase Plan `
+  -Config C:\ZavaPrivate\environment.json -Bundle C:\ZavaPrivate\site-plan-001
+```
+
+Review and approve this **separate site-only plan**, including the exact
+URL/title/owner, existing SharePoint license/quota and default tenant policies.
+After approved user-handled login:
+
+```powershell
+$siteBundle = 'C:\ZavaPrivate\site-plan-001'
+$siteHash = (Get-FileHash (Join-Path $siteBundle 'plan.json')).Hash.ToLowerInvariant()
+pwsh -NoProfile -File .\infra\zava\Setup-SharePointSite.ps1 -Phase Apply `
+  -Bundle $siteBundle -ApprovedPlanSha256 $siteHash
+```
+
+The bootstrap creates one communication site without a Microsoft 365 group or
+Teams team. It does not add members, invite people, edit permissions, upload
+content or seed other providers. The operator must own the site. Tenant
+provisioning policies can apply; unexpected content readers stop readback.
+Implicit tenant-administrator access is not removed or asserted absent.
+Other SharePoint clouds/hosts are a manual lane, not silently supported.
+
+Inspect `sharepoint-target.private.json`. Copy its `SiteId` and `DriveId` into
+the **private content configuration**, then generate and obtain approval for a
+new `Setup-Zava.ps1` content plan. Do not reuse the site-plan hash for content
+upload. Run the site bootstrap with `-Phase Verify` and the same hash for
+read-only site/library verification. All live site-creation paths remain
+untested; status polling and role-assignment reads are mocked regressions only.
 
 ## Approved login and deployment
 
