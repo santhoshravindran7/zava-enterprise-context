@@ -103,6 +103,8 @@ try {
         $failed = $false
         try { Invoke-ZavaSharePointSite -VerifyOnly } catch { if ($_.Exception.Message -notmatch 'Unexpected site reader') { throw }; $failed = $true }
         if (-not $failed) { throw 'Unexpected membership was hidden.' }
+        $latest = Read-ZavaJson (Join-Path $script:Context.Bundle 'sharepoint-target.private.json')
+        if ($latest.SiteStatus -ne 'NOT_VERIFIED' -or $latest.ContainsKey('DriveId')) { throw 'Failed readback left a stale verified target.' }
         $script:ExtraReader = $false
         $script:LibraryExtraReader = $true
         $failed = $false

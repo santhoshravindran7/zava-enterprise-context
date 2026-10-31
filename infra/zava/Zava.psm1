@@ -245,6 +245,10 @@ function Invoke-ZavaSharePointSite([switch]$VerifyOnly) {
     $config = $script:Context.Config
     $plan = Read-ZavaJson (Join-Path $script:Context.Bundle 'plan.json')
     if (-not $plan.ContainsKey('kind') -or $plan.kind -ne 'SHAREPOINT_SITE') { throw 'A separate approved SharePoint site plan is required.' }
+    Save-ZavaJson (Join-Path $script:Context.Bundle 'sharepoint-target.private.json') @{
+        Tenant = $config.tenantId; ObservedAt = [DateTimeOffset]::UtcNow.ToString('o')
+        SiteStatus = 'NOT_VERIFIED'; SourceIndexing = 'NOT_RUN'; FilesUploaded = 0
+    }
     Assert-ZavaIdentity
     $me = Invoke-ZavaRequest "$script:Graph/me?`$select=userPrincipalName" 'https://graph.microsoft.com'
     Assert-ZavaResponse $me @(200)
