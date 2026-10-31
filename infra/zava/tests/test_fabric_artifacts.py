@@ -98,7 +98,7 @@ class FabricArtifactsTests(unittest.TestCase):
             {row["role"]: row["name"] for row in core_rows},
             {
                 "FINANCE": "Zava Finance",
-                "COMMERCIAL": "Zava Commercial",
+                "COMMERCIAL": "Zava - Commercial",
                 "OPERATIONS": "Zava Operations",
             },
         )
@@ -314,8 +314,9 @@ class FabricArtifactsTests(unittest.TestCase):
             self.assertIn(datasource["artifactId"], artifacts.MODEL_IDS.values())
             seen.add(datasource["artifactId"])
             fact = next(f for f, placeholder in artifacts.MODEL_IDS.items() if placeholder == datasource["artifactId"])
-            self.assertEqual(datasource["displayName"], "Zava " + fact)
-            self.assertEqual(datasource_path, f"Files/Config/draft/semantic_model-Zava {fact}/datasource.json")
+            display_name = "Zava - Commercial" if fact == "Commercial" else "Zava " + fact
+            self.assertEqual(datasource["displayName"], display_name)
+            self.assertEqual(datasource_path, f"Files/Config/draft/semantic_model-{display_name}/datasource.json")
             self.assertIn(provider["instructions"], datasource["dataSourceInstructions"])
             self.assertNotIn("elements", datasource)  # optional; no fabricated native IDs
             self.assertNotIn("published", json.dumps(parts))

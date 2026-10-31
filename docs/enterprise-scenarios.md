@@ -2,7 +2,7 @@
 
 ## Story
 
-Zava Commercial supplies equipment and replenishment services. In early
+Zava supplies equipment and replenishment services. In early
 October 2026, leadership reviews September commercial commitments, recognized
 revenue, freight expense, fulfillment and recovery work. Different teams own
 different evidence: a sales stage is not a Finance recognition conclusion, an

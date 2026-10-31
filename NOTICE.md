@@ -1,6 +1,6 @@
 # Attribution and adaptations
 
-Portions of the Zava Commercial fixtures and setup implementation are adapted
+Portions of the Zava fixtures and setup implementation are adapted
 from Microsoft-authored materials. Applicable Microsoft copyright notices and
 the original MIT and CC BY 4.0 license texts are retained in this repository.
 

@@ -1,4 +1,4 @@
 OpportunityKey,AccountKey,PeriodKey,Customer,Segment,Stage,AmountUSD
-OPP-01,ZAVA,202609,Cedar Bridge Stores,North,Closed Won,8000000
-OPP-02,ZAVA,202609,Pine Grove Supply,South,Closed Won,6000000
-OPP-03,ZAVA,202609,Maple Works,North,Open Pipeline,2000000
+OPP-01,ZAVA,202609,Customer 01,North,Closed Won,8000000
+OPP-02,ZAVA,202609,Customer 02,South,Closed Won,6000000
+OPP-03,ZAVA,202609,Customer 03,North,Open Pipeline,2000000

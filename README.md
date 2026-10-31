@@ -1,7 +1,11 @@
 # Zava Enterprise Context
 
 A standalone synthetic enterprise dataset and approval-gated setup toolkit.
-Zava Commercial is a fictional equipment and replenishment-services business.
+Zava is a fictional equipment and replenishment-services business.
+
+Zava is the only named fictional company; customer and supplier display labels
+are anonymous identifiers. The versioned source adaptation preserves business
+facts, stable keys, joins and policy authority, and binds every changed byte.
 Its finance, sales, operations, procurement and customer-service teams share a
 consistent business story across documents, email, meeting archives, analytical
 data, directory personas, knowledge services and SaaS snapshots.

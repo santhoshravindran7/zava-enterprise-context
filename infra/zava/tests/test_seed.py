@@ -1,5 +1,6 @@
 import hashlib
 import json
+import re
 import sys
 import tempfile
 import unittest
@@ -44,6 +45,32 @@ class SeedTests(unittest.TestCase):
         for file in original["files"]:
             self.assertEqual(file["sha256"], seed.digest(self.output / "canonical" / file["path"]))
         self.assertEqual("NOT_RUN", self.manifest["nativeStatus"])
+
+    def test_company_and_partner_labels_in_full_source_content(self):
+        forbidden = re.compile(
+            r"Zava\s+Commercial|Cedar\s+Bridge|Pine\s+Grove|Maple\s+Works|"
+            r"Harbor\s+Components|Summit\s+Packaging", re.I
+        )
+        for root in (seed.CANONICAL, self.output):
+            for path in root.rglob("*"):
+                if not path.is_file():
+                    continue
+                if path.suffix == ".docx":
+                    with zipfile.ZipFile(path) as archive:
+                        text = "\n".join(
+                            "".join(ET.fromstring(archive.read(name)).itertext())
+                            for name in archive.namelist() if name.endswith(".xml")
+                        )
+                elif path.suffix == ".eml":
+                    text = seed.source_text(path)
+                elif path.suffix in {".md", ".json", ".csv", ".html", ".vtt"}:
+                    text = path.read_text(encoding="utf-8")
+                else:
+                    continue
+                with self.subTest(source=path.relative_to(root)):
+                    self.assertIsNone(forbidden.search(text))
+        account = (seed.CANONICAL / "fabric" / "accounts.csv").read_text()
+        self.assertIn("ZAVA,Zava\n", account)
 
     def test_docx_packages_are_parseable_and_preserve_full_content(self):
         for path in (self.output / "work" / "document").glob("*.docx"):

@@ -185,7 +185,7 @@ def build(output: Path, config_path: Path) -> dict:
                 "SYNTHETIC ZAVA-CONTEXT supporting context. Not an actual customer record or authorized decision.",
                 f"Source ID: {source_id}. Version: 1. Recorded: {day.isoformat()}.",
                 f"Fictional author: {person[1]}, {person[2]} ({person[0]}@zava.example).",
-                f"Review scope: Zava Commercial, {region} operating team, September 2026; evidence queue {number:03d}.",
+                f"Review scope: Zava, {region} operating team, September 2026; evidence queue {number:03d}.",
                 f"Agenda: {topic}. {request}",
                 f"Evidence request {source_id}-E1: preserve the original record, field names, account, period and currency.",
                 f"Evidence request {source_id}-E2: compare the current-policy effective date with the business cutoff, 2026-10-06T18:00:00Z.",
@@ -288,12 +288,12 @@ def build(output: Path, config_path: Path) -> dict:
                                   "version": "2" if "DOC-03" in path else "1"})
         write_json(base / "documents.json", {"value": documents})
         write_json(base / "knowledge-source.json", {
-            "name": name + "-source", "kind": "searchIndex", "description": "Synthetic Zava " + domain,
+            "name": name + "-source", "kind": "searchIndex", "description": "Synthetic Zava - " + domain,
             "searchIndexParameters": {"searchIndexName": name, "semanticConfigurationName": "zava",
                                      "sourceDataFields": [{"name": field} for field in ("sourcePath", "version", "title")],
                                      "searchFields": [{"name": "content"}]}})
         write_json(base / "knowledge-base.json", {
-            "name": name + "-kb", "description": "Synthetic Zava " + domain + "; extractive, no LLM planning",
+            "name": name + "-kb", "description": "Synthetic Zava - " + domain + "; extractive, no LLM planning",
             "knowledgeSources": [{"name": name + "-source"}]})
         knowledge.append({"name": name, "path": f"search/{domain}", "documents": len(documents)})
     from fabric_artifacts import generate

@@ -6,7 +6,7 @@
     {
       "id": "OPP-01",
       "native_id": null,
-      "customer": "Cedar Bridge Stores",
+      "customer": "Customer 01",
       "segment": "North",
       "stage": "Closed Won",
       "amount": 8000000,
@@ -17,7 +17,7 @@
     {
       "id": "OPP-02",
       "native_id": null,
-      "customer": "Pine Grove Supply",
+      "customer": "Customer 02",
       "segment": "South",
       "stage": "Closed Won",
       "amount": 6000000,
@@ -28,7 +28,7 @@
     {
       "id": "OPP-03",
       "native_id": null,
-      "customer": "Maple Works",
+      "customer": "Customer 03",
       "segment": "North",
       "stage": "Open Pipeline",
       "amount": 2000000,

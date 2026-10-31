@@ -44,7 +44,7 @@ MODEL_IDS = {
     "Commercial": "__MODEL_COMMERCIAL_ID__",
     "Operations": "__MODEL_OPERATIONS_ID__",
 }
-ONTOLOGY_NAME = "Zava Commercial Ontology"
+ONTOLOGY_NAME = "Zava Ontology"
 
 # Explicit physical schemas. Do not infer types from sparse or empty columns.
 # Int64 USD values remain integers (not floating-point currency).
@@ -577,7 +577,7 @@ def _agents(models: list[dict], providers: dict) -> list[dict]:
             }),
             _part(f"Files/Config/draft/semantic_model-{core['proposed_name']}/datasource.json", datasource),
         ]
-        results.append(_body(f"Zava {fact} Data Agent", "DataAgent", parts, "JSON"))
+        results.append(_body(f"Zava - {fact} Data Agent", "DataAgent", parts, "JSON"))
     return results
 
 

@@ -1,5 +1,5 @@
 {
-  "scenario": "ZAVA-ENTERPRISE-1",
+  "scenario": "ZAVA-ENTERPRISE-2",
   "synthetic": true,
   "native_status": "NOT_RUN",
   "files": [
@@ -15,13 +15,13 @@
     },
     {
       "path": "contracts/semantic-models.json",
-      "bytes": 9516,
-      "sha256": "2d841824e931647062a68b4592d3b70c8cbc98ffa738b7244de06829c3f884b2"
+      "bytes": 9518,
+      "sha256": "267982245e435e7a4089733a9f5a08e89f4375037b10c3a2737cd515bfe089d7"
     },
     {
       "path": "fabric/accounts.csv",
-      "bytes": 46,
-      "sha256": "8b846713e043c9a65efc595555563f9da609e76d718fd16dcf0ec345f50fd1af"
+      "bytes": 35,
+      "sha256": "2c0a16f70af3b67d9aafc3f8bda962a2ccd730ad4941ca9eca773be6165b39a9"
     },
     {
       "path": "fabric/batches.csv",
@@ -50,8 +50,8 @@
     },
     {
       "path": "fabric/opportunities.csv",
-      "bytes": 258,
-      "sha256": "7ea1beb2810b10c6690f2b4cdc5bf52094870f689ce1c2883869ad1dfdb977c5"
+      "bytes": 244,
+      "sha256": "350cecfe8f3a344c84b7a468955740c63b2ca9f4564ed8bb65e3ea77648c190e"
     },
     {
       "path": "fabric/periods.csv",
@@ -70,8 +70,8 @@
     },
     {
       "path": "fabric/suppliers.csv",
-      "bytes": 77,
-      "sha256": "1db1440f8c498f5be9202aa4def4efa8ea11608a4514b61ddd504ac35d89f09b"
+      "bytes": 66,
+      "sha256": "59e5f61390e4ad6d0da084f87a17c4f180037ea9efe71b4f8c180449428d1274"
     },
     {
       "path": "plugins/asana-project.json",
@@ -80,8 +80,8 @@
     },
     {
       "path": "plugins/salesforce-opportunities.json",
-      "bytes": 950,
-      "sha256": "431c88b3609145e1f5040da39a2bc951bfe671eacc37bf15bec3afc4fdb92ea4"
+      "bytes": 936,
+      "sha256": "09cf61280278eb4fd69581305ead7760cab6684b93daf808a1e033976ba6b7b0"
     },
     {
       "path": "web/WEB-01.md",
@@ -95,33 +95,33 @@
     },
     {
       "path": "work/DOC-01-commercial-review-charter.docx",
-      "bytes": 5153,
-      "sha256": "57c403e96699d1cd1132d96af21bb5423a629a3e3b8459d87a07be1388c2d4e3"
+      "bytes": 2702,
+      "sha256": "01116ee45beb0dba95c54d6732af2f52ce8b304ea1e176220cb113d9c9c06091"
     },
     {
       "path": "work/DOC-02-recognition-procedure-v1-superseded.docx",
-      "bytes": 4102,
-      "sha256": "367cf6c3c9e8c8e5071718425d173bac0c09e71270919379b41dc2ac441a1b96"
+      "bytes": 2278,
+      "sha256": "260f1ebb9f74c83c6f75afd8a5e0380d5bb0817e3a579d0796c0825abd15d1af"
     },
     {
       "path": "work/DOC-03-recognition-and-expedite-policy-v2.docx",
-      "bytes": 5653,
-      "sha256": "6acaefb3ddd9ea2127bb56b2ed770184bed786d1afa0bf192a8c7e5ff78c5543"
+      "bytes": 2887,
+      "sha256": "c5647667fb9405d69c439d68b00049f7609e2f800c6aaa08c863541b56ee57a1"
     },
     {
       "path": "work/DOC-04-supplier-and-freight-evidence-review.docx",
-      "bytes": 5046,
-      "sha256": "3fae2d36a03b834d0f631cbb6b7b611b0d83a4d50d5701fde88734aae8a2adcf"
+      "bytes": 2622,
+      "sha256": "f49b72bcc7f4d6c3ab3552518550db9736f0ba89b4e87c589548e5915eff9853"
     },
     {
       "path": "work/DOC-05-customer-commitments-and-communications.docx",
-      "bytes": 4629,
-      "sha256": "1e5db5531fc25294e989d49609c3f411000d74f923c897e1acfad3b927f589dc"
+      "bytes": 2464,
+      "sha256": "38461c70d24ca1dc0f7ce5c3973066925eda2ab42b5f2e0d7c73951d9fbe0b4b"
     },
     {
       "path": "work/MAIL-01.eml",
-      "bytes": 1165,
-      "sha256": "177aecda373f174b98c85458b2c1919db6cf82dfacb797e119f6d5c2b4b5d43b"
+      "bytes": 1154,
+      "sha256": "645d2cc8d435f522a3797a8628f14674616ea3919335298ce4cb594e81aec335"
     },
     {
       "path": "work/MAIL-02.eml",
@@ -130,13 +130,13 @@
     },
     {
       "path": "work/MAIL-03.eml",
-      "bytes": 963,
-      "sha256": "9f01cd04d00eabcd104fb32ca2fb2bad7024cffbe3552490017e143b4675bfea"
+      "bytes": 960,
+      "sha256": "d089d14fd8d389d60704a03e1e244bf0ac15f10d1861282d91193eed7ea3ef32"
     },
     {
       "path": "work/MAIL-04.eml",
-      "bytes": 967,
-      "sha256": "28cb70bb295a71076ac7b59f1c1791f023c7aaf6ef5340d9e422442fad93232d"
+      "bytes": 956,
+      "sha256": "107a666fd5e209dcaf79a4e6fcd5d8262228452bb862cb26de98c787ab7da7ab"
     },
     {
       "path": "work/MAIL-05.eml",
@@ -145,8 +145,8 @@
     },
     {
       "path": "work/MAIL-06.eml",
-      "bytes": 887,
-      "sha256": "13fb3f5ca1238cf572cf86f6c6763b64a2884f5e15e888f782b34f5fc918e515"
+      "bytes": 870,
+      "sha256": "1691b6eb5ca5c55f5598eafe6c5b5499f2ee4a8231f375d34bd5aaafa6fa9b19"
     },
     {
       "path": "work/MAIL-07.eml",
@@ -158,5 +158,11 @@
       "bytes": 948,
       "sha256": "363526bce28994cfa357579f565a695eba91f98b998ea77ede54aba4454c9fb7"
     }
-  ]
+  ],
+  "adaptation": {
+    "revision": "ZAVA_ONLY_V2",
+    "parent_manifest_sha256": "726d42e7df2dd5504038b02d8607921734d820d2361f00dd10f0a2de1e3d9217",
+    "adapted_at": "2026-10-31T21:37:53.098562+00:00",
+    "scope": "Company/partner display labels only; keys, facts and policy rules preserved"
+  }
 }
